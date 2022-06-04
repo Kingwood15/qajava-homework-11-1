@@ -3,71 +3,80 @@ package ru.netology.manager.MovieManager;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@AllArgsConstructor
+//@AllArgsConstructor
 @Data
 public class MovieManager {
 
-    private Movie[] movies = new Movie[0];
-    private int numberLastMovies;
+    private MoviesRepo repo = new MoviesRepo();
 
     public MovieManager() {
 
-        this.numberLastMovies = 10;
+        repo.setNumberLastMovies(10);
+        repo.findAll();
     }
 
     public MovieManager(int numberLastMovies) {
 
-        this.numberLastMovies = numberLastMovies;
+        repo.setNumberLastMovies(numberLastMovies);
+        repo.findAll();
+
+    }
+
+    //принимает репозиторий от Mokito
+    public MovieManager(MoviesRepo repoForMockito) {
+
+        repo.setNumberLastMovies(10);
+        this.repo = repoForMockito;
 
     }
 
     public void add(Movie newMovie) {
 
-        int length = movies.length + 1;
-        Movie[] tmp = new Movie[length];
-
-        // в цикле копируется массив
-        for (int i = 0; i < movies.length; i++) {
-            tmp[i] = movies[i];
-        }
-
-        // добавление нового элемента
-        int lastIndex = tmp.length - 1;
-        tmp[lastIndex] = newMovie;
-
-        movies = tmp;
+        repo.save(newMovie);
     }
 
     public Movie[] findAll() {
 
-        return movies;
+        return repo.findAll();
     }
 
     public Movie[] findLast() {
 
-        if (numberLastMovies < movies.length) {
+        if (repo.getNumberLastMovies() < repo.getMovies().length) {
 
-            Movie[] result = new Movie[numberLastMovies];
+            Movie[] result = new Movie[repo.getNumberLastMovies()];
 
             //заполняем массив в обратном порядке
-            for (int i = 0; i < numberLastMovies; i++) {
-                int index = movies.length - i - 1;
-                result[i] = movies[index];
+            for (int i = 0; i < result.length; i++) {
+                int index = repo.getMovies().length - i - 1;
+                result[i] = repo.findById(index);
             }
 
             return result;
 
         } else {
 
-            Movie[] result = new Movie[movies.length];
+            Movie[] result = new Movie[repo.getMovies().length];
 
             //заполняем массив в обратном порядке
-            for (int i = 0; i < movies.length; i++) {
-                int index = movies.length - i - 1;
-                result[i] = movies[index];
+            for (int i = 0; i < result.length; i++) {
+                int index = repo.getMovies().length - i - 1;
+                result[i] = repo.findById(index);
             }
 
             return result;
         }
+    }
+
+    public Movie[] removeById(int removeId) {
+
+        return repo.removeById(removeId);
+
+    }
+
+    public Movie[] removeAll() {
+
+        return repo.removeAll();
+
     }
 }
